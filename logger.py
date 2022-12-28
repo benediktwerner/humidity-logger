@@ -10,32 +10,31 @@ from influxdb_client.client.write_api import SYNCHRONOUS, WritePrecision
 CONFIG_FILE = "config.toml"
 
 
-@dataclass(slots=True)
+@dataclass
 class Config:
     sampling_period: int = 10  # in seconds
     influx_url: str = "http://localhost:8086"
     influx_bucket: str = "humidity"
     influx_org: str = "wernerfamily"
-    influx_token: str | None = None
+    influx_token: str = ""
+
+
+def log(*args):
+    print(*args, file=sys.stderr)
 
 
 config = Config()
-try:
-    if os.path.isfile(CONFIG_FILE):
-        with open(CONFIG_FILE) as f:
-            for key, val in toml.load(f).items():
-                setattr(config, key.lower(), val)
-except Exception as e:
-    log("Failed to load configuration:", e)
+with open(os.path.join(os.path.dirname(__file__), CONFIG_FILE)) as f:
+    for key, val in toml.load(f).items():
+        if hasattr(config, key.lower()):
+            setattr(config, key.lower(), val)
+        else:
+            log("ERROR: Unknown config value:", key, "- Skipping.")
 
 
 sense = SenseHat()
 client = InfluxDBClient(config.influx_url, config.influx_token, org=config.influx_org)
 write_api = client.write_api(SYNCHRONOUS)
-
-
-def log(*args):
-    print(*args, file=sys.stderr)
 
 
 def get_point():
