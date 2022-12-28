@@ -1,0 +1,12 @@
+[Unit]
+Description=Humidity Logger
+
+[Service]
+User=wernerfamily
+Type=simple
+Restart=always
+RestartSec=1
+ExecStart=/home/wernerfamily/humidity-logger/logger.py
+
+[Install]
+WantedBy=multi-user.target
