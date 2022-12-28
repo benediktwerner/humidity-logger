@@ -42,13 +42,13 @@ def get_point():
     return (
         Point("humidity")
         .tag("sensor", 1)
-        .field("humidity", round(sense.get_humidity(), 2))
-        .field("pressure", round(sense.get_pressure(), 2))
+        .field("humidity", float(sense.get_humidity()))
+        .field("pressure", float(sense.get_pressure()))
         .field(
-            "temperature_from_humidity", round(sense.get_temperature_from_humidity(), 2)
+            "temperature_from_humidity", float(sense.get_temperature_from_humidity())
         )
         .field(
-            "temperature_from_pressure", round(sense.get_temperature_from_pressure(), 2)
+            "temperature_from_pressure", float(sense.get_temperature_from_pressure())
         )
         .time(int(time.time()), WritePrecision.S)
     )
