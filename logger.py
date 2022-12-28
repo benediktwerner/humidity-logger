@@ -24,7 +24,7 @@ try:
     if os.path.isfile(CONFIG_FILE):
         with open(CONFIG_FILE) as f:
             for key, val in toml.load(f).items():
-                setattr(config, key, val)
+                setattr(config, key.lower(), val)
 except Exception as e:
     log("Failed to load configuration:", e)
 
