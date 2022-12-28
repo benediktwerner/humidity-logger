@@ -1,5 +1,8 @@
 # Raspberry Pi Humidity Logger
 
+- Grafana: `localhost:3000`
+- IndexDB: `localhost:8086`
+
 ## Setup Grafana and InfluxDB
 
 1. Install Raspberry OS Lite 64-bit using Raspberry Imager (https://grafana.com/tutorials/install-grafana-on-raspberry-pi/)
