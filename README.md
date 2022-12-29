@@ -42,7 +42,7 @@ Go to `hostname:3000` and log in with `admin:admin`
 2. Install influxdb lib: `sudo apt-get install -y python3-pip && pip install 'influxdb-client[ciso]'`
 3. Copy `logger.py` to `~/humidity-logger/logger.py`
 4. Create InfluxDB token for data collector: `influx auth create --org wernerfamily --write-buckets`
-5. Create `~/humidity-logger/config.toml` and insert token: `INFLUX_TOKEN = "ytKaItj-tj3vjjoWWcl2bS9Vx0Bi6rzShgNyDT-6bzy2y-Ur47byRnOEVVIcASDPig37KgFPpovxD8gvAsGatA=="`
+5. Create `~/humidity-logger/config.toml` and insert token: `INFLUX_TOKEN = "ytKaItj-tj3vjjoWWcl2bS9Vx0Bi6rzShgNyDT-6bzy2y-Ur47byRnOEVVIcASDPig37KgFPpovxD8gvAsGatA=="` and `ROOM = "room name"`
 6. Optionally also configure `SAMPLING_PERIOD`, `INFLUX_URL`, `INFLUX_BUCKET`, `INFLUX_ORG`
 7. Copy `humidity-logger.service` to `/etc/systemd/system/`
 8.  Start and enable the service:

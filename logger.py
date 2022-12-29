@@ -12,24 +12,21 @@ CONFIG_FILE = "config.toml"
 
 @dataclass
 class Config:
+    room: str
+    influx_token: str
     sampling_period: int = 10  # in seconds
     influx_url: str = "http://localhost:8086"
     influx_bucket: str = "humidity"
     influx_org: str = "wernerfamily"
-    influx_token: str = ""
 
 
 def log(*args):
     print(*args, file=sys.stderr)
 
 
-config = Config()
 with open(os.path.join(os.path.dirname(__file__), CONFIG_FILE)) as f:
-    for key, val in toml.load(f).items():
-        if hasattr(config, key.lower()):
-            setattr(config, key.lower(), val)
-        else:
-            log("ERROR: Unknown config value:", key, "- Skipping.")
+    vals = {key.lower(): val for key, val in toml.load(f).items()}
+    config = Config(**vals)
 
 
 sense = SenseHat()
@@ -40,7 +37,7 @@ write_api = client.write_api(SYNCHRONOUS)
 def get_point():
     return (
         Point("humidity")
-        .tag("sensor", 1)
+        .tag("sensor", config.room)
         .field("humidity", float(sense.get_humidity()))
         .field("pressure", float(sense.get_pressure()))
         .field(
