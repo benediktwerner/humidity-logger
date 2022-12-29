@@ -1,9 +1,9 @@
 # Raspberry Pi Humidity Logger
 
-- Grafana: `localhost:3000`
-- IndexDB: `localhost:8086`
+- Grafana Dashboard: `localhost:3000`
+- IndexDB Dashboard: `localhost:8086`
 
-## Setup Grafana and InfluxDB
+## Setup Grafana and InfluxDB node
 
 1. Install Raspberry OS Lite 64-bit using Raspberry Imager (https://grafana.com/tutorials/install-grafana-on-raspberry-pi/)
 2. Install InfluxDB: https://docs.influxdata.com/influxdb/v2.6/install/?t=Raspberry+Pi
@@ -31,23 +31,26 @@ sudo systemctl start grafana-server
 sudo systemctl status grafana-server
 ```
 
-Go to `hostname:3000` and log in with `admin:admin`
-
 4. Creage InfluxDB token for Grafana: `influx auth create --org wernerfamily --all-access -d grafana`
-5. Setup InflxuDB data source in Grafana
+5. Go to `hostname:3000` and log in with `admin:admin`
+6. Setup InflxuDB data source in Grafana
 
-## Setup data source
+## Setup data collection node
 
-1. Install sense-hat lib: `sudo apt-get install sense-hat`
-2. Install influxdb lib: `sudo apt-get install -y python3-pip && pip install 'influxdb-client[ciso]'`
-3. Copy `logger.py` to `~/humidity-logger/logger.py`
-4. Create InfluxDB token for data collector: `influx auth create --org wernerfamily --write-buckets`
-5. Create `~/humidity-logger/config.toml` and insert token: `INFLUX_TOKEN = "ytKaItj-tj3vjjoWWcl2bS9Vx0Bi6rzShgNyDT-6bzy2y-Ur47byRnOEVVIcASDPig37KgFPpovxD8gvAsGatA=="` and `ROOM = "room name"`
-6. Optionally also configure `SAMPLING_PERIOD`, `INFLUX_URL`, `INFLUX_BUCKET`, `INFLUX_ORG`
-7. Copy `humidity-logger.service` to `/etc/systemd/system/`
-8.  Start and enable the service:
+1. Install Raspberry OS Lite 64-bit using Raspberry Imager (https://grafana.com/tutorials/install-grafana-on-raspberry-pi/)
+
+### Use the setup script
+2. Run `curl 'https://raw.githubusercontent.com/benediktwerner/humidity-logger/master/setup-data-node.py' | python3`
+
+### or do it manually
+2. Install sense-hat lib: `sudo apt-get install sense-hat`
+3. Install influxdb lib: `sudo apt-get install -y python3-pip && pip install 'influxdb-client[ciso]'`
+4. Copy `logger.py` to `~/humidity-logger/logger.py`
+5. Copy `config.toml.example` to `~/humidity-logger/config.toml` and adjust the values
+  - You can create an InfluxDB token via the InfluxDB UI at `http://hostname:8086` or via `influx auth create --org wernerfamily --write-buckets`
+6.  Copy `humidity-logger.service` to `/etc/systemd/system/`
+7.  Enable and start the service:
 ```bash
 sudo systemctl enable humidity-logger
 sudo systemctl start humidity-logger
-sudo systemctl status humidity-logger
 ```

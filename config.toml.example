@@ -1,0 +1,6 @@
+ROOM = ""
+SAMPLING_PERIOD = 5 # seconds
+INFLUX_TOKEN = ""
+INFLUX_URL = "http://humidity1:8086"
+INFLUX_ORG = "wernerfamily"
+INFLUX_BUCKET = "humidity"

@@ -1,12 +1,11 @@
 [Unit]
 Description=Humidity Logger
-After=influxdb.service
 
 [Service]
 User=wernerfamily
 Type=simple
 Restart=always
-RestartSec=1
+RestartSec=10
 ExecStart=/home/wernerfamily/humidity-logger/logger.py
 
 [Install]

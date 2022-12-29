@@ -13,11 +13,11 @@ CONFIG_FILE = "config.toml"
 @dataclass
 class Config:
     room: str
+    sampling_period: int  # in seconds
+    influx_url: str  # "http://localhost:8086"
+    influx_org: str  # "wernerfamily"
     influx_token: str
-    sampling_period: int = 10  # in seconds
-    influx_url: str = "http://localhost:8086"
-    influx_bucket: str = "humidity"
-    influx_org: str = "wernerfamily"
+    influx_bucket: str  # "humidity"
 
 
 def log(*args):
