@@ -11,8 +11,11 @@ from influxdb_client.client.write_api import SYNCHRONOUS, WritePrecision
 
 CONFIG_FILE = "config.toml"
 DISPLAY_WINDOW = 5 * 60
-DISPLAY_COLOR = [80, 100, 255]
+COLOR_OK = [80, 100, 255]
+COLOR_BAD = [255, 0, 0]
 COLOR_OFF = [0, 0, 0]
+MIN_H = 20
+MAX_H = 50
 
 
 @dataclass
@@ -56,13 +59,9 @@ class Measurement:
 
 
 def pixel_row(h):
-    if h is None:
-        on = 0
-    elif min_h == max_h:
-        on = 4
-    else:
-        on = round(8 * (h - min_h) / (max_h - min_h))
-    return [DISPLAY_COLOR] * on + [COLOR_OFF] * (8 - on)
+    h = max(MIN_H, min(h, MAX_H))
+    on = round(8 * (h - MIN_H) / (MAX_H - MIN_H))
+    return [COLOR_OK if h < 40 else COLOR_BAD] * on + [COLOR_OFF] * (8 - on)
 
 
 def history_windows(t):
@@ -78,7 +77,7 @@ def history_windows(t):
         history.pop()
     while len(rows) < 8:
         rows.append([])
-    return [(median(r) if r else None) for r in reversed(rows)]
+    return [(median(r) if r else MIN_H) for r in reversed(rows)]
 
 
 def log(*args):
@@ -109,8 +108,6 @@ while True:
     m = Measurement.take()
     history.appendleft(m)
     windows = history_windows(m.time + 1)
-    min_h = min(w for w in windows if w is not None)
-    max_h = max(w for w in windows if w is not None)
     sense.set_pixels(sum(map(pixel_row, windows), []))
 
     write_api.write(config.influx_bucket, config.influx_org, m.to_influx_point())
