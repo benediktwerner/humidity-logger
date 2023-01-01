@@ -16,6 +16,7 @@ if len(args) == 0 or any(a not in ARGS for a in args[1:]) or args[0].startswith(
         "HOSTNAME",
         *("[" + "|".join(a) + "]" for a in (SERVICE_ARGS, RESTART_ARGS)),
     )
+    exit(1)
 
 host, *args = args
 host = f"wernerfamily@{host}"
@@ -23,12 +24,19 @@ host = f"wernerfamily@{host}"
 print("Connecting to", host)
 
 
+def system(cmd):
+    res = os.system(cmd)
+    if res != 0:
+        print(f"`{cmd}` returned with exit code {res}")
+        exit(res)
+
+
 def ssh(cmd):
-    os.system(f"ssh {host} '{cmd}'")
+    system(f"ssh {host} '{cmd}'")
 
 
 def scp(file):
-    os.system(f"scp {file} {host}:{DIRECTORY}")
+    system(f"scp {file} {host}:{DIRECTORY}")
 
 
 def sudo_scp(file, target):
