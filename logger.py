@@ -98,7 +98,7 @@ def history_windows():
     t = history[0].time + 1
     rows = []
     for h in history:
-        if h.time < t:
+        while h.time < t:
             if len(rows) == 8:
                 break
             rows.append([])
