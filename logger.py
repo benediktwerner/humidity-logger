@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from collections import deque
 from statistics import mean
-import time, toml, os, sys, atexit, pickle
+import time, toml, os, sys, atexit, pickle, threading
 from sense_hat import (
     SenseHat,
     ACTION_PRESSED,
@@ -95,15 +95,16 @@ def pixel_row(h):
 
 
 def history_windows():
-    t = history[0].time + 1
-    rows = []
-    for h in history:
-        while h.time < t:
-            if len(rows) == 8:
-                break
-            rows.append([])
-            t -= DISPLAY_WINDOWS[display_window]
-        rows[-1].append(h.humidity)
+    with history_lock:
+        t = history[0].time + 1
+        rows = []
+        for h in history:
+            while h.time < t:
+                if len(rows) == 8:
+                    break
+                rows.append([])
+                t -= DISPLAY_WINDOWS[display_window]
+            rows[-1].append(h.humidity)
     while len(rows) < 8:
         rows.append([])
     return [(mean(r) if r else min_h) for r in reversed(rows)]
@@ -188,14 +189,15 @@ def log(*args):
 config = Config.load()
 sense = SenseHat()
 sense.low_light = True
-sense.stick.direction_any = on_stick_moved
 client = InfluxDBClient(config.influx_url, config.influx_token, org=config.influx_org)
 write_api = client.write_api(SYNCHRONOUS)
 
 history = read_history_from_file()
+history_lock = threading.Lock()
 last_input = 0
 reset_display_vars()
 
+sense.stick.direction_any = on_stick_moved
 atexit.register(dump_history_to_file)
 
 # First measurement is often a bit weird
@@ -207,15 +209,17 @@ log("Started...")
 while True:
     m = Measurement.take()
 
-    # clear old history
-    while len(history) > 1 and history[-1].time < m.time - DISPLAY_WINDOWS[0] * 8:
-        history.pop()
+    with history_lock:
+        history.appendleft(m)
+
+        # clear old history
+        while len(history) > 1 and history[-1].time < m.time - DISPLAY_WINDOWS[0] * 8:
+            history.pop()
 
     # reset display parameters if no user input in a while
     if last_input < m.time - RESET_DISPLAY_TIMEOUT:
         reset_display_vars()
 
-    history.appendleft(m)
     redraw()
 
     write_api.write(config.influx_bucket, config.influx_org, m.to_influx_point())
