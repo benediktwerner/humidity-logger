@@ -6,7 +6,7 @@
 ## Setup Grafana and InfluxDB node
 
 1. Install Raspberry OS Lite 64-bit using Raspberry Imager (https://www.raspberrypi.com/software/) and boot the Pi
-  - Make sure to activate SSH and setup WiFi
+    - Make sure to activate SSH and setup WiFi
 2. SSH onto the Pi from a PC in the same WiFi: `ssh username@domainNameOrIpOfThePi`
 3. Install InfluxDB: https://docs.influxdata.com/influxdb/v2.6/install/?t=Raspberry+Pi
 
@@ -34,8 +34,8 @@ sudo systemctl status grafana-server
 ```
 
 5. Create InfluxDB token for Grafana:
-  - via the CLI: `influx auth create --org <name of the org created during influx setup> --all-access -d grafana`
-  - via the InfluxDB dashboard at `http://domainNameOrIpOfThePi:8086` (easiest to give it all access)
+    - via the CLI: `influx auth create --org <name of the org created during influx setup> --all-access -d grafana`
+    - via the InfluxDB dashboard at `http://domainNameOrIpOfThePi:8086` (easiest to give it all access)
 6. Go to `http://domainNameOrIpOfThePi:3000` and log in with `admin:admin`
 7. Setup InflxuDB data source in Grafana using the token created above and `localhost:8086` as the endpoint
 
@@ -44,23 +44,24 @@ sudo systemctl status grafana-server
 Can also be done on the Grafana/InfluxDB node (in which case you'd ofc skip step 1).
 
 1. Install Raspberry OS Lite 64-bit using Raspberry Imager (https://www.raspberrypi.com/software/) and boot the Pi
-  - Make sure to activate SSH and setup WiFi
+    - Make sure to activate SSH and setup WiFi
 2. SSH onto the Pi from a PC in the same WiFi: `ssh username@domainNameOrIpOfThePi`
+3. Continue with Option 1 or 2
 
 ### Option 1: Use the setup script
 
-**Note:** Currently this has hard-coded values (influx hostname, token, org, and bucket) for our specific setup. If you're setting this up elsewhere, you want to download the file first, adjust the influx values at the top, and only then run it.
+> **Note**: Currently this has hard-coded values (influx hostname, token, org, and bucket) for our specific setup. If you're setting this up elsewhere, you want to download the file first, adjust the influx values at the top, and only then run it.
 
-3. Run `curl 'https://raw.githubusercontent.com/benediktwerner/humidity-logger/master/setup-data-node.py' | python3`
+4. Run `curl 'https://raw.githubusercontent.com/benediktwerner/humidity-logger/master/setup-data-node.py' | python3`
 
 ### Option 2: Do it manually
-3. Install sense-hat lib: `sudo apt-get install sense-hat`
-4. Install influxdb lib: `sudo apt-get install -y python3-pip && pip install 'influxdb-client[ciso]'`
-5. Copy `logger.py` from this repo to `~/humidity-logger/logger.py`
-5. Copy `config.toml.example` from this repo to `~/humidity-logger/config.toml` and adjust the values
-  - You can create an InfluxDB token via the InfluxDB UI at `http://domainNameOrIpOfThePi:8086` (give it write access to the bucket you want to use or just all buckets) or via `influx auth create --org <org name> --write-buckets`. You can reuse the same token for all data nodes.
-6.  Copy `humidity-logger.service` from this repo to `/etc/systemd/system/`
-7.  Enable and start the service:
+4. Install sense-hat lib: `sudo apt-get install -y sense-hat`
+5. Install influxdb lib: `sudo apt-get install -y python3-pip && pip install 'influxdb-client[ciso]'`
+6. Copy `logger.py` from this repo to `~/humidity-logger/logger.py`
+7. Copy `config.toml.example` from this repo to `~/humidity-logger/config.toml` and adjust the values
+    - You can create an InfluxDB token via the InfluxDB UI at `http://domainNameOrIpOfThePi:8086` (give it write access to the bucket you want to use or just all buckets) or via `influx auth create --org <org name> --write-buckets`. You can reuse the same token for all data nodes.
+8.  Copy `humidity-logger.service` from this repo to `/etc/systemd/system/`
+9.  Enable and start the service:
 ```bash
 sudo systemctl enable humidity-logger
 sudo systemctl start humidity-logger
