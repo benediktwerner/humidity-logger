@@ -5,8 +5,10 @@
 
 ## Setup Grafana and InfluxDB node
 
-1. Install Raspberry OS Lite 64-bit using Raspberry Imager (https://grafana.com/tutorials/install-grafana-on-raspberry-pi/)
-2. Install InfluxDB: https://docs.influxdata.com/influxdb/v2.6/install/?t=Raspberry+Pi
+1. Install Raspberry OS Lite 64-bit using Raspberry Imager (https://www.raspberrypi.com/software/) and boot the Pi
+  - Make sure to activate SSH and setup WiFi
+2. SSH onto the Pi from a PC in the same WiFi: `ssh username@domainNameOrIpOfThePi`
+3. Install InfluxDB: https://docs.influxdata.com/influxdb/v2.6/install/?t=Raspberry+Pi
 
 ```bash
 wget -q https://repos.influxdata.com/influxdb.key
@@ -19,7 +21,7 @@ sudo systemctl status influxdb
 influx setup
 ```
 
-3. Install Grafana (https://grafana.com/tutorials/install-grafana-on-raspberry-pi/)
+4. Install Grafana (https://grafana.com/tutorials/install-grafana-on-raspberry-pi/)
 
 ```bash
 wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
@@ -31,24 +33,33 @@ sudo systemctl start grafana-server
 sudo systemctl status grafana-server
 ```
 
-4. Creage InfluxDB token for Grafana: `influx auth create --org wernerfamily --all-access -d grafana`
-5. Go to `hostname:3000` and log in with `admin:admin`
-6. Setup InflxuDB data source in Grafana
+5. Create InfluxDB token for Grafana:
+  - via the CLI: `influx auth create --org <name of the org created during influx setup> --all-access -d grafana`
+  - via the InfluxDB dashboard at `http://domainNameOrIpOfThePi:8086` (easiest to give it all access)
+6. Go to `http://domainNameOrIpOfThePi:3000` and log in with `admin:admin`
+7. Setup InflxuDB data source in Grafana using the token created above and `localhost:8086` as the endpoint
 
 ## Setup data collection node
 
-1. Install Raspberry OS Lite 64-bit using Raspberry Imager (https://grafana.com/tutorials/install-grafana-on-raspberry-pi/)
+Can also be done on the Grafana/InfluxDB node (in which case you'd ofc skip step 1).
 
-### Use the setup script
-2. Run `curl 'https://raw.githubusercontent.com/benediktwerner/humidity-logger/master/setup-data-node.py' | python3`
+1. Install Raspberry OS Lite 64-bit using Raspberry Imager (https://www.raspberrypi.com/software/) and boot the Pi
+  - Make sure to activate SSH and setup WiFi
+2. SSH onto the Pi from a PC in the same WiFi: `ssh username@domainNameOrIpOfThePi`
 
-### or do it manually
-2. Install sense-hat lib: `sudo apt-get install sense-hat`
-3. Install influxdb lib: `sudo apt-get install -y python3-pip && pip install 'influxdb-client[ciso]'`
-4. Copy `logger.py` to `~/humidity-logger/logger.py`
-5. Copy `config.toml.example` to `~/humidity-logger/config.toml` and adjust the values
-  - You can create an InfluxDB token via the InfluxDB UI at `http://hostname:8086` or via `influx auth create --org wernerfamily --write-buckets`
-6.  Copy `humidity-logger.service` to `/etc/systemd/system/`
+### Option 1: Use the setup script
+
+**Note:** Currently this has hard-coded values (influx hostname, token, org, and bucket) for our specific setup. If you're setting this up elsewhere, you want to download the file first, adjust the influx values at the top, and only then run it.
+
+3. Run `curl 'https://raw.githubusercontent.com/benediktwerner/humidity-logger/master/setup-data-node.py' | python3`
+
+### Option 2: Do it manually
+3. Install sense-hat lib: `sudo apt-get install sense-hat`
+4. Install influxdb lib: `sudo apt-get install -y python3-pip && pip install 'influxdb-client[ciso]'`
+5. Copy `logger.py` from this repo to `~/humidity-logger/logger.py`
+5. Copy `config.toml.example` from this repo to `~/humidity-logger/config.toml` and adjust the values
+  - You can create an InfluxDB token via the InfluxDB UI at `http://domainNameOrIpOfThePi:8086` (give it write access to the bucket you want to use or just all buckets) or via `influx auth create --org <org name> --write-buckets`. You can reuse the same token for all data nodes.
+6.  Copy `humidity-logger.service` from this repo to `/etc/systemd/system/`
 7.  Enable and start the service:
 ```bash
 sudo systemctl enable humidity-logger
