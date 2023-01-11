@@ -7,7 +7,7 @@ Type=simple
 Restart=always
 RestartSec=10
 KillSignal=SIGINT
-ExecStart=/home/wernerfamily/humidity-logger/logger.py
+ExecStart=/usr/bin/env python3 /home/wernerfamily/humidity-logger/logger.py
 
 [Install]
 WantedBy=multi-user.target

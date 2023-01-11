@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, time
+import os, pwd
 
 SCRIPT_URL = (
     "https://raw.githubusercontent.com/benediktwerner/humidity-logger/master/logger.py"
@@ -13,15 +13,34 @@ INFLUX_PORT = 8086
 INFLUX_ORG = "wernerfamily"
 INFLUX_BUCKET = "humidity"
 
-os.system("sudo apt-get install -y sense-hat python3-pip")
-os.system("pip install 'influxdb-client[ciso]'")
 
-os.system("mkdir ~/humidity-logger")
-os.system(f"wget '{SCRIPT_URL}' -O ~/humidity-logger/logger.py")
-os.system(f"wget '{SERVICE_URL}' -O ~/humidity-logger/humidity-logger.service")
-os.system("sudo mv ~/humidity-logger/humidity-logger.service /etc/systemd/system/")
+def system(cmd):
+    print(">", cmd)
+    res = os.system(cmd)
+    if res != 0:
+        print(f"`{cmd}` returned with exit code {res}")
+        exit(res)
 
-with open("~/humidity-logger/config.toml", "w") as f:
+
+system("sudo apt-get install -y sense-hat python3-pip")
+system("pip install 'influxdb-client[ciso]'")
+
+system("mkdir -p ~/humidity-logger")
+system(f"wget '{SCRIPT_URL}' -O ~/humidity-logger/logger.py")
+system(f"wget '{SERVICE_URL}' -O ~/humidity-logger/humidity-logger.service")
+
+service_fname = os.path.expanduser("~/humidity-logger/humidity-logger.service")
+
+with open(service_fname, "r") as f:
+    service_content = f.read()
+
+with open(service_fname, "w") as f:
+    f.write(service_content.replace("wernerfamily", pwd.getpwuid(os.getuid())))
+
+system("sudo mv ~/humidity-logger/humidity-logger.service /etc/systemd/system/")
+system("sudo chown root:root /etc/systemd/system/humidity-logger.service")
+
+with open(os.path.expanduser("~/humidity-logger/config.toml"), "w") as f:
     print(f'ROOM = "{input("Room name: ")}"', file=f)
     print(f"SAMPLING_PERIOD = {SAMPLING_PERIOD}", file=f)
     print(f'INFLUX_TOKEN = "{INFLUX_TOKEN}"', file=f)
@@ -31,9 +50,9 @@ with open("~/humidity-logger/config.toml", "w") as f:
 
 print("Wrote configuration to ~/humidity-logger/config.toml")
 
-os.system("sudo systemctl enable humidity-logger")
+system("sudo systemctl enable humidity-logger")
 
 if input("Start service? (Y/n) ").strip().lower() in ("", "y"):
-    os.system("sudo systemctl start humidity-logger")
+    system("sudo systemctl restart humidity-logger")
 else:
     print("Run 'sudo systemctl start humidity-logger' to start")
