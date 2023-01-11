@@ -60,8 +60,9 @@ Can also be done on the Grafana/InfluxDB node (in which case you'd ofc skip step
 6. Copy `logger.py` from this repo to `~/humidity-logger/logger.py`
 7. Copy `config.toml.example` from this repo to `~/humidity-logger/config.toml` and adjust the values
     - You can create an InfluxDB token via the InfluxDB UI at `http://domainNameOrIpOfThePi:8086` (give it write access to the bucket you want to use or just all buckets) or via `influx auth create --org <org name> --write-buckets`. You can reuse the same token for all data nodes.
-8.  Copy `humidity-logger.service` from this repo to `/etc/systemd/system/`
-9.  Enable and start the service:
+8. Copy `humidity-logger.service` from this repo to `/etc/systemd/system/`
+9. Edit the file and change all instances of `wernerfamily` to the username running on the pi (run `whoami` to find out what it is)
+10.  Enable and start the service:
 ```bash
 sudo systemctl enable humidity-logger
 sudo systemctl start humidity-logger
