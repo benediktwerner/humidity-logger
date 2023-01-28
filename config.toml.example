@@ -1,6 +1,6 @@
-ROOM = ""
-SAMPLING_PERIOD = 5 # seconds
-INFLUX_TOKEN = ""
-INFLUX_URL = "http://humidity1:8086"
-INFLUX_ORG = "wernerfamily"
-INFLUX_BUCKET = "humidity"
+ROOM = "%roomname%"
+SAMPLING_PERIOD = %samplingperiod% # seconds
+INFLUX_TOKEN = "%influxtoken%"
+INFLUX_URL = "http://%influxhost%:%influxport"
+INFLUX_ORG = "%influxorg%"
+INFLUX_BUCKET = "%influxbucket%"
