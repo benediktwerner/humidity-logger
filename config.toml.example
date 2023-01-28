@@ -1,6 +1,6 @@
 ROOM = "%roomname%"
 SAMPLING_PERIOD = %samplingperiod% # seconds
 INFLUX_TOKEN = "%influxtoken%"
-INFLUX_URL = "http://%influxhost%:%influxport"
+INFLUX_URL = "http://%influxhost%:%influxport%"
 INFLUX_ORG = "%influxorg%"
 INFLUX_BUCKET = "%influxbucket%"
