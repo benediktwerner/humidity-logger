@@ -94,12 +94,16 @@ GRAFANA_PKG="grafana"
 GRAFANA_KEY_STATUS=$(apt-key list 2> /dev/null | grep "${GRAFANA_PKG}")
 GRAFANA_INSTALL_STATUS=$(dpkg-query --status "${GRAFANA_PKG}" | grep Status)
 if [[ ! $GRAFANA_KEY_STATUS ]]; then
-    wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
-    echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+    wget -O - https://packages.grafana.com/gpg.key | apt-key add -
+fi
+
+if [ ! -f "/etc/apt/sources.list.d/grafana.list" ]; then
+    echo "deb https://packages.grafana.com/oss/deb stable main" | tee -a /etc/apt/sources.list.d/grafana.list
     apt update
 fi
 
 if [[ ! "$GRAFANA_INSTALL_STATUS" == *"install ok installed"* ]]; then
+    apt update
     apt install -y "${GRAFANA_PKG}"
     systemctl daemon-reload
     systemctl enable grafana-server
