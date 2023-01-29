@@ -65,9 +65,9 @@ fi
 
 mkdir -p "${HOME_DIR}/humidity-logger"
 # Force IPv4 for wget command using -4 flag
-${WGET} -4 "${SCRIPT_URL}" --directory-prefix="${HOME_DIR}/humidity-logger/"
-${WGET} -4 "${SERVICE_URL}" --directory-prefix="${HOME_DIR}/humidity-logger/"
-${WGET} -4 "${CONFIG_URL}" --directory-prefix="${HOME_DIR}/humidity-logger/"
+${WGET} -4 "${SCRIPT_URL}" -O "${HOME_DIR}/humidity-logger/${SCRIPT_URL##*/}"
+${WGET} -4 "${SERVICE_URL}" -O "${HOME_DIR}/humidity-logger/${SERVICE_URL##*/}"
+${WGET} -4 "${CONFIG_URL}" -O "${HOME_DIR}/humidity-logger/${CONFIG_FILE}"
 mv "${HOME_DIR}/humidity-logger/${CONFIG_FILE}" "${HOME_DIR}/humidity-logger/${CONFIG_FILE%.*}"
 
 # Insert current Username in service file
@@ -94,12 +94,16 @@ GRAFANA_PKG="grafana"
 GRAFANA_KEY_STATUS=$(apt-key list 2> /dev/null | grep "${GRAFANA_PKG}")
 GRAFANA_INSTALL_STATUS=$(dpkg-query --status "${GRAFANA_PKG}" | grep Status)
 if [[ ! $GRAFANA_KEY_STATUS ]]; then
-    wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
-    echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+    wget -O - https://packages.grafana.com/gpg.key | apt-key add -
+fi
+
+if [ ! -f "/etc/apt/sources.list.d/grafana.list" ]; then
+    echo "deb https://packages.grafana.com/oss/deb stable main" | tee -a /etc/apt/sources.list.d/grafana.list
     apt update
 fi
 
 if [[ ! "$GRAFANA_INSTALL_STATUS" == *"install ok installed"* ]]; then
+    apt update
     apt install -y "${GRAFANA_PKG}"
     systemctl daemon-reload
     systemctl enable grafana-server
