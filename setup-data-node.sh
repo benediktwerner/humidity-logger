@@ -65,9 +65,9 @@ fi
 
 mkdir -p "${HOME_DIR}/humidity-logger"
 # Force IPv4 for wget command using -4 flag
-${WGET} -4 "${SCRIPT_URL}" --directory-prefix="${HOME_DIR}/humidity-logger/"
-${WGET} -4 "${SERVICE_URL}" --directory-prefix="${HOME_DIR}/humidity-logger/"
-${WGET} -4 "${CONFIG_URL}" --directory-prefix="${HOME_DIR}/humidity-logger/"
+${WGET} -4 "${SCRIPT_URL}" -O "${HOME_DIR}/humidity-logger/${SCRIPT_URL##*/}"
+${WGET} -4 "${SERVICE_URL}" -O "${HOME_DIR}/humidity-logger/${SERVICE_URL##*/}"
+${WGET} -4 "${CONFIG_URL}" -O "${HOME_DIR}/humidity-logger/${CONFIG_FILE}"
 mv "${HOME_DIR}/humidity-logger/${CONFIG_FILE}" "${HOME_DIR}/humidity-logger/${CONFIG_FILE%.*}"
 
 # Insert current Username in service file
