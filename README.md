@@ -54,7 +54,7 @@ Can also be done on the Grafana/InfluxDB node (in which case you'd ofc skip step
 > **Note**: Currently the value of influx host is hardcoded to `localhost`. The script will fetch the values of token, org, and bucket automatically based on the
 > values provided when script executes `influx setup` command, please ensure to provide values for each fields.
 
-4. Run `curl 'https://raw.githubusercontent.com/benediktwerner/humidity-logger/master/setup-data-node.sh' | /bin/bash`
+4. Run `curl 'https://raw.githubusercontent.com/benediktwerner/humidity-logger/master/setup-data-node.sh' | sudo /usr/bin/bash`
 
 ### Option 2: Do it manually
 4. Install sense-hat lib: `sudo apt-get install -y sense-hat`
