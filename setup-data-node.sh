@@ -118,6 +118,8 @@ sed -i "s/%influxorg%/${INFLUX_ORG}/g" "${HOME_DIR}/humidity-logger/${GRAFANA_DA
 sed -i "s/%influxbucket%/${INFLUX_BUCKET}/g" "${HOME_DIR}/humidity-logger/${GRAFANA_DATA_SRC_FILE}"
 mv "${HOME_DIR}/humidity-logger/${GRAFANA_DATA_SRC_FILE}" "/etc/grafana/provisioning/datasources/"
 
+pip3 install 'influxdb-client[ciso]'
+
 systemctl stop grafana-server
 systemctl start grafana-server
 
