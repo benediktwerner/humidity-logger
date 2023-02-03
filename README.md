@@ -55,9 +55,10 @@ Can also be done on the Grafana/InfluxDB node (in which case you'd ofc skip step
 
 ### Option 1: Use the setup script
 
-> **Note**: Currently this has hard-coded values (influx hostname, token, org, and bucket) for our specific setup. If you're setting this up elsewhere, you want to download the file first, adjust the influx values at the top, and only then run it.
+> **Note**: Currently the value of influx host is hardcoded to `localhost`. The script will fetch the values of token, org, and bucket automatically based on the
+> values provided when script executes `influx setup` command, please ensure to provide values for each fields.
 
-4. Run `curl 'https://raw.githubusercontent.com/benediktwerner/humidity-logger/master/setup-data-node.py' | python3`
+4. Run `curl https://raw.githubusercontent.com/benediktwerner/humidity-logger/master/setup-data-node.sh -o setup-data-node.sh && chmod +x setup-data-node.sh && sudo ./setup-data-node.sh`
 
 ### Option 2: Do it manually
 
